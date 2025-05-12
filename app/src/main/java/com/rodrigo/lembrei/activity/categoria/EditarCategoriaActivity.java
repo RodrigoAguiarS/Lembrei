@@ -1,7 +1,6 @@
 package com.rodrigo.lembrei.activity.categoria;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -9,13 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.rodrigo.lembrei.R;
+import com.rodrigo.lembrei.activity.BaseActivity;
 import com.rodrigo.lembrei.data.Categoria;
 import com.rodrigo.lembrei.db.DBHelper;
 import com.rodrigo.lembrei.repository.CategoriaRepository;
@@ -24,7 +22,7 @@ import com.rodrigo.lembrei.service.impl.CategoriaServiceImpl;
 import com.skydoves.colorpickerview.ColorPickerDialog;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
-public class EditarCategoriaActivity extends AppCompatActivity {
+public class EditarCategoriaActivity extends BaseActivity {
     private TextInputEditText edtNomeCategoria, edtIcone, edtCorHex;
     private View viewCorPreview;
     private Button btnSalvarCategoria;
@@ -37,6 +35,8 @@ public class EditarCategoriaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_categoria);
+
+        configurarBottomNavigation();
 
         categoria = (Categoria) getIntent().getSerializableExtra("categoria");
         if (categoria == null) {
@@ -51,7 +51,6 @@ public class EditarCategoriaActivity extends AppCompatActivity {
         configurarBotaoSalvar();
         configurarSeletores();
         preencherDadosCategoria();
-        configurarFAB();
     }
 
     private void inicializarComponentes() {
@@ -61,14 +60,6 @@ public class EditarCategoriaActivity extends AppCompatActivity {
         viewCorPreview = findViewById(R.id.viewCorPreview);
         btnSalvarCategoria = findViewById(R.id.btnSalvarCategoria);
         btnSelecionarIcone = findViewById(R.id.btnSelecionarIcone);
-    }
-
-    private void configurarFAB() {
-        FloatingActionButton fabListaCategorias = findViewById(R.id.fabListaCategorias);
-        fabListaCategorias.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ListaCategoriasActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void configurarToolbar() {

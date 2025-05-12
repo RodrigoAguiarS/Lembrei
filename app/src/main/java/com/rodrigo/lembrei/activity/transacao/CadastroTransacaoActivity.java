@@ -12,15 +12,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.rodrigo.lembrei.R;
+import com.rodrigo.lembrei.activity.BaseActivity;
+import com.rodrigo.lembrei.data.Categoria;
 import com.rodrigo.lembrei.data.Frequencia;
 import com.rodrigo.lembrei.data.TipoTransacao;
 import com.rodrigo.lembrei.data.Transacao;
 import com.rodrigo.lembrei.db.DBHelper;
+import com.rodrigo.lembrei.repository.CategoriaRepository;
 import com.rodrigo.lembrei.repository.TransacaoRepository;
+import com.rodrigo.lembrei.service.CategoriaService;
 import com.rodrigo.lembrei.service.TransacaoService;
+import com.rodrigo.lembrei.service.impl.CategoriaServiceImpl;
 import com.rodrigo.lembrei.service.impl.TransacaoServiceImpl;
 
 import java.math.BigDecimal;
@@ -28,22 +34,25 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
+import java.util.List;
 
-public class CadastroTransacaoActivity extends AppCompatActivity {
-    private TextInputEditText edtTitulo, edtTotalParcelas, edtNumeroParcela, edtValor, edtDataVencimento, edtObservacoes;
+public class CadastroTransacaoActivity extends BaseActivity {
+    private TextInputEditText edtTitulo, edtTotalParcelas, edtValor, edtDataVencimento, edtObservacoes;
     private RadioGroup rgTipo;
-
     private CheckBox cbParcelado;
-    private TextInputLayout layoutTotalParcelas, layoutNumeroParcela;
+    private TextInputLayout layoutTotalParcelas;
     private Spinner spnFrequencia;
+    private Spinner spnCategoria;
     private Button btnSalvar;
     private TransacaoService transacaoService;
+    private CategoriaService categoriaService;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_transacao);
+        configurarBottomNavigation();
 
         inicializarComponentes();
         configurarServicos();
@@ -51,6 +60,7 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
         configurarDatePicker();
         configurarBotaoSalvar();
         configurarParcelamento();
+        configurarSpinnerCategoria();
     }
 
     private void inicializarComponentes() {
@@ -60,18 +70,19 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
         edtObservacoes = findViewById(R.id.edtObservacoes);
         rgTipo = findViewById(R.id.rgTipo);
         spnFrequencia = findViewById(R.id.spnFrequencia);
+        spnCategoria = findViewById(R.id.spnCategoria);
         btnSalvar = findViewById(R.id.btnSalvar);
         cbParcelado = findViewById(R.id.cbParcelado);
         layoutTotalParcelas = findViewById(R.id.layoutTotalParcelas);
-        layoutNumeroParcela = findViewById(R.id.layoutNumeroParcela);
         edtTotalParcelas = findViewById(R.id.edtTotalParcelas);
-        edtNumeroParcela = findViewById(R.id.edtNumeroParcela);
     }
 
     private void configurarServicos() {
         DBHelper dbHelper = new DBHelper(this);
         TransacaoRepository repository = new TransacaoRepository(dbHelper.getWritableDatabase());
         transacaoService = new TransacaoServiceImpl(repository);
+        CategoriaRepository categoriaRepository = new CategoriaRepository(dbHelper.getWritableDatabase());
+        categoriaService = new CategoriaServiceImpl(categoriaRepository);
     }
 
     private void configurarSpinnerFrequencia() {
@@ -79,6 +90,17 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, Frequencia.values());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnFrequencia.setAdapter(adapter);
+    }
+
+    private void configurarSpinnerCategoria() {
+        List<Categoria> categorias = categoriaService.listarTodas();
+        ArrayAdapter<Categoria> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                categorias
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnCategoria.setAdapter(adapter);
     }
 
     private void configurarDatePicker() {
@@ -99,10 +121,8 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
     private void configurarParcelamento() {
         cbParcelado.setOnCheckedChangeListener((buttonView, isChecked) -> {
             layoutTotalParcelas.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            layoutNumeroParcela.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (!isChecked) {
                 edtTotalParcelas.setText("");
-                edtNumeroParcela.setText("");
             }
         });
     }
@@ -118,6 +138,7 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
             String dataVencimentoTexto = edtDataVencimento.getText() != null ? edtDataVencimento.getText().toString().trim() : "";
             String observacoes = edtObservacoes.getText() != null ? edtObservacoes.getText().toString().trim() : "";
 
+            // Validações obrigatórias
             if (titulo.isEmpty()) {
                 edtTitulo.setError("Título obrigatório");
                 return;
@@ -139,17 +160,23 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
                 return;
             }
 
-            BigDecimal valor;
+            Categoria categoriaSelecionada = (Categoria) spnCategoria.getSelectedItem();
+            if (categoriaSelecionada == null) {
+                Toast.makeText(this, "Selecione uma categoria", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            BigDecimal valorTotal;
             try {
-                valor = new BigDecimal(valorTexto);
+                valorTotal = new BigDecimal(valorTexto);
             } catch (NumberFormatException e) {
                 edtValor.setError("Valor inválido");
                 return;
             }
 
-            LocalDate dataVencimento;
+            LocalDate dataVencimentoInicial;
             try {
-                dataVencimento = LocalDate.parse(dataVencimentoTexto, dateFormatter);
+                dataVencimentoInicial = LocalDate.parse(dataVencimentoTexto, dateFormatter);
             } catch (DateTimeParseException e) {
                 edtDataVencimento.setError("Data inválida");
                 return;
@@ -158,38 +185,65 @@ public class CadastroTransacaoActivity extends AppCompatActivity {
             if (cbParcelado.isChecked()) {
                 String totalParcelasTexto = edtTotalParcelas.getText() != null ?
                         edtTotalParcelas.getText().toString().trim() : "";
-                String numeroParcelaTexto = edtNumeroParcela.getText() != null ?
-                        edtNumeroParcela.getText().toString().trim() : "";
 
                 if (totalParcelasTexto.isEmpty()) {
                     edtTotalParcelas.setError("Total de parcelas obrigatório");
                     return;
                 }
 
-                if (numeroParcelaTexto.isEmpty()) {
-                    edtNumeroParcela.setError("Número da parcela obrigatório");
-                    return;
-                }
-
                 int totalParcelas = Integer.parseInt(totalParcelasTexto);
-                int numeroParcela = Integer.parseInt(numeroParcelaTexto);
-
-                if (numeroParcela > totalParcelas) {
-                    edtNumeroParcela.setError("Número da parcela não pode ser maior que o total");
+                if (totalParcelas <= 0) {
+                    edtTotalParcelas.setError("Total de parcelas deve ser maior que zero");
                     return;
                 }
+
+                BigDecimal valorParcela = valorTotal.divide(
+                        new BigDecimal(totalParcelas),
+                        2,
+                        BigDecimal.ROUND_HALF_UP
+                );
+
+                // Cria uma transação para cada parcela
+                for (int numeroParcela = 1; numeroParcela <= totalParcelas; numeroParcela++) {
+                    Transacao transacao = new Transacao();
+
+                    transacao.setTitulo(titulo + " (" + numeroParcela + "/" + totalParcelas + ")");
+                    transacao.setTipo(radioId == R.id.rbPagar ? TipoTransacao.PAGAR : TipoTransacao.RECEBER);
+                    transacao.setValor(valorParcela);
+                    transacao.setCategoriaId(categoriaSelecionada.getId());
+                    transacao.setFrequencia((Frequencia) spnFrequencia.getSelectedItem());
+                    transacao.setObservacoes(observacoes);
+
+                    transacao.setParcelado(true);
+                    transacao.setTotalParcelas(totalParcelas);
+                    transacao.setNumeroParcela(numeroParcela);
+
+                    LocalDate dataVencimentoParcela = dataVencimentoInicial.plusMonths(numeroParcela - 1);
+                    transacao.setDataVencimento(dataVencimentoParcela);
+
+                    transacaoService.salvar(transacao);
+                }
+
+                Toast.makeText(this,
+                        "Transação parcelada salva com sucesso: " + totalParcelas + " parcelas",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Transacao transacao = new Transacao();
+                transacao.setTitulo(titulo);
+                transacao.setTipo(radioId == R.id.rbPagar ? TipoTransacao.PAGAR : TipoTransacao.RECEBER);
+                transacao.setValor(valorTotal);
+                transacao.setDataVencimento(dataVencimentoInicial);
+                transacao.setCategoriaId(categoriaSelecionada.getId());
+                transacao.setFrequencia((Frequencia) spnFrequencia.getSelectedItem());
+                transacao.setObservacoes(observacoes);
+                transacao.setParcelado(false);
+                transacao.setTotalParcelas(1);
+                transacao.setNumeroParcela(1);
+
+                transacaoService.salvar(transacao);
+                Toast.makeText(this, "Transação salva com sucesso!", Toast.LENGTH_SHORT).show();
             }
 
-            Transacao transacao = new Transacao();
-            transacao.setTitulo(titulo);
-            transacao.setTipo(radioId == R.id.rbPagar ? TipoTransacao.PAGAR : TipoTransacao.RECEBER);
-            transacao.setValor(valor);
-            transacao.setDataVencimento(dataVencimento);
-            transacao.setFrequencia((Frequencia) spnFrequencia.getSelectedItem());
-            transacao.setObservacoes(observacoes);
-
-            transacaoService.salvar(transacao);
-            Toast.makeText(this, "Transação salva com sucesso!", Toast.LENGTH_SHORT).show();
             finish();
         } catch (Exception e) {
             Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_LONG).show();

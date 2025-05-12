@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_add_transacao"
+        android:icon="@drawable/baseline_format_list_bulleted_24"
+        android:title="Nova Transação" />
+    <item
+        android:id="@+id/action_add_categoria"
+        android:icon="@drawable/baseline_category_24"
+        android:title="Nova Categoria" />
+</menu>

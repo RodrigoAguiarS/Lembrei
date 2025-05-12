@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FF6200EE</color>
-    <color name="primary_dark">#FF3700B3</color>
-    <color name="secondary">#FF03DAC5</color>
-    <color name="secondary_dark">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+<color name="background">#FF121212</color> <!-- Preto fosco -->
+<color name="text_primary">#FFFFFFFF</color> <!-- Texto branco -->
+<color name="primary">#FFFFD700</color> <!-- Dourado -->
+<color name="primary_dark">#FFFFAB00</color> <!-- Dourado queimado -->
+<color name="secondary">#FF424242</color> <!-- Cinza escuro -->
+<color name="secondary_dark">#FF212121</color> <!-- Quase preto -->
+<color name="black">#FF000000</color>
+<color name="white">#FFFFFFFF</color>
 </resources>
+
+

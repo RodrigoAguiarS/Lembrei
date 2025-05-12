@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rodrigo.lembrei.R;
+import com.rodrigo.lembrei.activity.BaseActivity;
 import com.rodrigo.lembrei.data.Categoria;
 import com.rodrigo.lembrei.adapter.CategoriaAdapter;
 import com.rodrigo.lembrei.db.DBHelper;
@@ -18,7 +19,7 @@ import com.rodrigo.lembrei.repository.CategoriaRepository;
 import com.rodrigo.lembrei.service.CategoriaService;
 import com.rodrigo.lembrei.service.impl.CategoriaServiceImpl;
 
-public class ListaCategoriasActivity extends AppCompatActivity {
+public class ListaCategoriasActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private CategoriaAdapter adapter;
     private CategoriaService categoriaService;
@@ -27,6 +28,7 @@ public class ListaCategoriasActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_categorias);
+        configurarBottomNavigation();
 
         inicializarComponentes();
         configurarRecyclerView();
@@ -49,7 +51,6 @@ public class ListaCategoriasActivity extends AppCompatActivity {
     private void configurarRecyclerView() {
         adapter = new CategoriaAdapter();
         adapter.setOnItemClickListener(categoria -> {
-            // Implementar ação de clique no item (edição)
             Toast.makeText(this, "Categoria: " + categoria.getNome(), Toast.LENGTH_SHORT).show();
         });
 

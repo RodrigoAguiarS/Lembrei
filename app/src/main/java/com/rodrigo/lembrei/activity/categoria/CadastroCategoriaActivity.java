@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rodrigo.lembrei.R;
+import com.rodrigo.lembrei.activity.BaseActivity;
 import com.skydoves.colorpickerview.ColorPickerDialog;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 import com.rodrigo.lembrei.db.DBHelper;
@@ -21,7 +22,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.rodrigo.lembrei.service.CategoriaService;
 import com.rodrigo.lembrei.service.impl.CategoriaServiceImpl;
 
-public class CadastroCategoriaActivity extends AppCompatActivity {
+public class CadastroCategoriaActivity extends BaseActivity {
     private TextInputEditText edtNomeCategoria, edtIcone, edtCorHex;
     private View viewCorPreview;
     private Button btnSalvarCategoria;
@@ -33,12 +34,12 @@ public class CadastroCategoriaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_categoria);
+        configurarBottomNavigation();
 
         inicializarComponentes();
         configurarServicos();
         configurarBotaoSalvar();
         configurarSeletores();
-        configurarFAB();
     }
 
     private void inicializarComponentes() {
@@ -84,14 +85,6 @@ public class CadastroCategoriaActivity extends AppCompatActivity {
                     edtIcone.setText(iconeSelecionado);
                 });
         builder.show();
-    }
-
-    private void configurarFAB() {
-        FloatingActionButton fabListaCategorias = findViewById(R.id.fabListaCategorias);
-        fabListaCategorias.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ListaCategoriasActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void configurarServicos() {
