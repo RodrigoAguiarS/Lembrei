@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.rodrigo.lembrei.data.Frequencia;
 import com.rodrigo.lembrei.data.TipoTransacao;
 import com.rodrigo.lembrei.data.Transacao;
+import com.rodrigo.lembrei.data.TransacaoFiltro;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -217,5 +218,74 @@ public class TransacaoRepository {
         }
         cursor.close();
         return total;
+    }
+
+    public List<Transacao> buscarTransacoesPaginadas(TransacaoFiltro filtro, int pagina, int itensPorPagina) {
+        List<String> whereClausulas = new ArrayList<>();
+        List<String> argumentos = new ArrayList<>();
+
+        if (filtro.getTipo() != null) {
+            whereClausulas.add("tipo = ?");
+            argumentos.add(filtro.getTipo().name());
+        }
+
+        if (filtro.getPago() != null) {
+            whereClausulas.add("pago = ?");
+            argumentos.add(filtro.getPago() ? "1" : "0");
+        }
+
+        if (filtro.getAtrasado() != null && filtro.getAtrasado()) {
+            whereClausulas.add("data_vencimento < date('now') AND pago = 0");
+        }
+
+        if (filtro.getValorMinimo() != null) {
+            whereClausulas.add("CAST(valor AS DECIMAL) >= ?");
+            argumentos.add(filtro.getValorMinimo().toString());
+        }
+
+        if (filtro.getValorMaximo() != null) {
+            whereClausulas.add("CAST(valor AS DECIMAL) <= ?");
+            argumentos.add(filtro.getValorMaximo().toString());
+        }
+
+        if (filtro.getDataInicial() != null) {
+            whereClausulas.add("data_vencimento >= ?");
+            argumentos.add(filtro.getDataInicial().toString());
+        }
+
+        if (filtro.getDataFinal() != null) {
+            whereClausulas.add("data_vencimento <= ?");
+            argumentos.add(filtro.getDataFinal().toString());
+        }
+
+        if (filtro.getTextoBusca() != null && !filtro.getTextoBusca().isEmpty()) {
+            whereClausulas.add("titulo LIKE ?");
+            argumentos.add("%" + filtro.getTextoBusca() + "%");
+        }
+
+        String whereClause = whereClausulas.isEmpty() ? null :
+                String.join(" AND ", whereClausulas);
+        String[] whereArgs = argumentos.toArray(new String[0]);
+        int offset = (pagina - 1) * itensPorPagina;
+
+        List<Transacao> transacoes = new ArrayList<>();
+        Cursor cursor = db.query(
+                TABELA,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                "data_vencimento ASC",
+                offset + "," + itensPorPagina
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                transacoes.add(criarTransacao(cursor));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return transacoes;
     }
 }

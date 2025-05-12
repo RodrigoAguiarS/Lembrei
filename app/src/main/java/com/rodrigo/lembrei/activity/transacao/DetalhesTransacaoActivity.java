@@ -3,12 +3,14 @@ package com.rodrigo.lembrei.activity.transacao;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.rodrigo.lembrei.R;
 import com.rodrigo.lembrei.activity.BaseActivity;
+import com.rodrigo.lembrei.activity.dashboard.DashboardActivity;
 import com.rodrigo.lembrei.data.Categoria;
 import com.rodrigo.lembrei.data.TipoTransacao;
 import com.rodrigo.lembrei.data.Transacao;
@@ -134,5 +136,14 @@ public class DetalhesTransacaoActivity extends BaseActivity {
                 })
                 .setNegativeButton("Não", null)
                 .show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -26,7 +28,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:label="Nova Transação"/>
+            android:label="Main"/>
 
         <activity
             android:name=".activity.transacao.CadastroTransacaoActivity"
@@ -36,7 +38,7 @@
         <activity
             android:name=".activity.transacao.ListaTransacoesActivity"
             android:exported="false"
-            android:label="Nova Transação"/>
+            android:label="Lista de Transação"/>
 
         <activity
             android:name=".activity.transacao.EditarTransacaoActivity"
@@ -56,12 +58,12 @@
         <activity
             android:name=".activity.categoria.ListaCategoriasActivity"
             android:exported="false"
-            android:label="Categorias"/>
+            android:label="Lista de Categorias"/>
 
         <activity
             android:name=".activity.categoria.EditarCategoriaActivity"
             android:exported="false"
-            android:label="Categorias"/>
+            android:label="Editar Categoria"/>
 
     </application>
 </manifest>

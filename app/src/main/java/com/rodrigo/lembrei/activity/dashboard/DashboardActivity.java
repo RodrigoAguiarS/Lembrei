@@ -173,10 +173,4 @@ public class DashboardActivity extends BaseActivity implements TransacaoAdapter.
         intent.putExtra("transacao_id", transacao.getId());
         startActivity(intent);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_add, menu);
-        return true;
-    }
 }

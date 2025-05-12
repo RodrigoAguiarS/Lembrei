@@ -2,6 +2,7 @@ package com.rodrigo.lembrei.activity.transacao;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.rodrigo.lembrei.R;
+import com.rodrigo.lembrei.activity.BaseActivity;
 import com.rodrigo.lembrei.data.Categoria;
 import com.rodrigo.lembrei.data.Frequencia;
 import com.rodrigo.lembrei.data.TipoTransacao;
@@ -33,7 +35,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.List;
 
-public class EditarTransacaoActivity extends AppCompatActivity {
+public class EditarTransacaoActivity extends BaseActivity {
     private TextInputEditText edtTitulo, edtValor, edtDataVencimento, edtObservacoes;
     private RadioGroup rgTipo;
     private RadioButton rbPagar, rbReceber;
@@ -48,6 +50,7 @@ public class EditarTransacaoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_transacao);
+        configurarBottomNavigation();
 
         Long transacaoId = getIntent().getLongExtra("transacao_id", -1);
         if (transacaoId == -1) {
@@ -209,5 +212,14 @@ public class EditarTransacaoActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

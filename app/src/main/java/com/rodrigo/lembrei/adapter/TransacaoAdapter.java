@@ -42,6 +42,17 @@ public class TransacaoAdapter extends RecyclerView.Adapter<TransacaoAdapter.Tran
         return new TransacaoViewHolder(itemView);
     }
 
+    public void adicionarItens(List<Transacao> novosItens) {
+        int posicaoInicio = transacoes.size();
+        transacoes.addAll(novosItens);
+        notifyItemRangeInserted(posicaoInicio, novosItens.size());
+    }
+
+    public void limparLista() {
+        transacoes.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(@NonNull TransacaoViewHolder holder, int position) {
         Transacao transacao = transacoes.get(position);

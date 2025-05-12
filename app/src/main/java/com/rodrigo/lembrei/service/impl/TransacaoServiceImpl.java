@@ -2,6 +2,7 @@ package com.rodrigo.lembrei.service.impl;
 
 import com.rodrigo.lembrei.data.TipoTransacao;
 import com.rodrigo.lembrei.data.Transacao;
+import com.rodrigo.lembrei.data.TransacaoFiltro;
 import com.rodrigo.lembrei.repository.TransacaoRepository;
 import com.rodrigo.lembrei.service.TransacaoService;
 
@@ -28,6 +29,11 @@ public class TransacaoServiceImpl implements TransacaoService {
     public Transacao atualizar(Transacao transacao) {
         repository.atualizar(transacao);
         return repository.buscarPorId(transacao.getId());
+    }
+
+    @Override
+    public List<Transacao> buscarTransacoesPaginadas(TransacaoFiltro filtro, int pagina, int itensPorPagina) {
+        return repository.buscarTransacoesPaginadas(filtro, pagina, itensPorPagina);
     }
 
     @Override
@@ -80,5 +86,17 @@ public class TransacaoServiceImpl implements TransacaoService {
     @Override
     public List<Transacao> listarPendentes() {
         return repository.buscarPendentes();
+    }
+
+    @Override
+    public List<Transacao> listarTransacoesProximasVencimento() {
+        LocalDate hoje = LocalDate.now();
+        LocalDate tresDiasDepois = hoje.plusDays(3);
+
+        return repository.buscarPorPeriodo(
+                hoje,
+                tresDiasDepois,
+                false
+        );
     }
 }

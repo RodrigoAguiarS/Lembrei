@@ -2,6 +2,7 @@ package com.rodrigo.lembrei.service;
 
 import com.rodrigo.lembrei.data.TipoTransacao;
 import com.rodrigo.lembrei.data.Transacao;
+import com.rodrigo.lembrei.data.TransacaoFiltro;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +16,8 @@ public interface TransacaoService {
     void deletar(Long id);
     List<Transacao> buscarPorTipo(TipoTransacao tipo);
     List<Transacao> listarPendentes();
+    List<Transacao> listarTransacoesProximasVencimento();
+    List<Transacao> buscarTransacoesPaginadas(TransacaoFiltro filtro, int pagina, int itensPorPagina);
     BigDecimal calcularTotalMes(TipoTransacao tipo);
     List<Transacao> listarProximasTransacoes();
     List<Transacao> listarItensVencidos();
